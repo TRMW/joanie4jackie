@@ -1,0 +1,554 @@
+/*
+Theme Name:     Joanie 4 Jackie
+Theme URI:      http: //www.joanie4jackie.com
+Description:    This is the theme for the new Joanie 4 Jackie website!
+Author:         Matt Wright
+Author URI:     http: //www.trmw.org
+Version:        1.0
+Text Domain:    j4j
+*/
+
+/* Structure */
+
+body {
+  padding: 42px 0;
+  }
+
+.container {
+  width: 980px;
+  margin: 0 auto;
+  padding: 0 20px;
+  }
+
+.main {
+  clear: both;
+  margin-top: 60px;
+  position: relative;
+  }
+
+.sidebar {
+  width: 250px;
+  float: left;
+  }
+
+.tax-chainletter .content,
+.tax-costar .content,
+.single-event .content,
+.single-archive .content,
+.single-post .content,
+.page-id-11 .content,
+.page-id-9 .content,
+.page-id-6951 .content { /* last 3 are event, archive, and now pages */
+  width: 690px;
+  float: right;
+  }
+
+.footer {
+  clear: both;
+  margin-top: 60px;
+  }
+
+
+/* Globals */
+
+body {
+  background-color: white;
+  }
+
+body,
+input,
+textarea {
+  color: black;
+  font-size: 12px;
+  }
+
+a,
+a:visited {
+  color: black;
+  text-decoration: none;
+  }
+
+a:active,
+a:hover,
+.content a:active,
+.content a:hover,
+.current-menu-item a {
+  color: black;
+  background-color: #00E54A;
+  }
+
+.content a,
+.content a:visited {
+  text-decoration: underline;
+  }
+
+h1,
+h2,
+h3 {
+  color: black;
+  margin: 0;
+  }
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  }
+
+.site-title a,
+nav a { /* header, sidebar, footer links */
+  padding: 5px;
+  }
+
+p {
+  line-height: 1.4;
+  }
+
+.page p:last-child {
+  margin-bottom: 0;
+  }
+
+.edit-link {
+  font-weight: bold;
+  }
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+textarea {
+  box-sizing: border-box;
+  padding: 7px;
+  border: 1px solid #ccc;
+  }
+
+.entry-photoset {
+  overflow: hidden;
+  }
+
+.wp-post-image {
+  background-color: #EEE;
+  }
+  
+.wp-caption {
+  font-size: 11px;
+  }
+
+
+/* Fonts  */
+
+body,
+input {
+  font-family: "Courier New", Courier, monospace;
+  }
+
+.front-title,
+.site-title,
+.page-title,
+.entry-title,
+.entry-author {
+  font-family: "Century OS MT W02 Bold", Georgia, serif;
+  font-weight: normal;
+  }
+
+.video .entry-title {
+  font-family: "CenturyOSMTW02-BoldItal", Georgia, serif;
+  }
+
+
+/* Header + Footer */
+
+.site-title,
+.nav,
+.nav ul,
+.nav li,
+.search-form {
+  display: inline-block;
+  vertical-align: bottom;
+  }
+
+.site-title {
+  font-size: 20px;
+  height: 24px;
+  width: 156px; /* prevent layout shifting when font loads */
+  margin-left: -5px; /* counteract site-link padding */
+  }
+
+.site-title,
+.nav li {
+  margin-right: 20px;
+  }
+
+#search-input {
+  position: relative;
+  top: 6px;
+  width: 118px; /* alight with right edge of page */
+  padding-top: 5px;
+  padding-bottom: 5px;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  outline: none;
+  }
+
+
+/* Sidebar */
+
+.sidebar,
+.toc_list {
+  margin-left: -5px; /* counteract inline-block on links and line up with header */
+  }
+
+.sidebar li,
+.toc_list li {
+  margin-bottom: 10px;
+  }
+
+.sidebar a,
+.toc_list a {
+  display: inline-block;
+  }
+
+/* Now Page */
+
+#toc_container {
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  position: sticky;
+  top: 0;
+  float: left;
+  margin-top: -20px;
+  padding: 20px 0 10px;
+  width: 250px;
+  font-size: 12px; /* otherwise it'll inherit the larger content font-size */
+  overflow-y: auto;
+  }
+
+#toc_container.fixed {
+  position: fixed;
+  top: 20px;
+  bottom: 0;
+  }
+
+#toc_container a {
+  text-decoration: none;
+  padding: 5px;
+  }
+
+.toc_list li {
+  font-weight: bold;
+  }
+
+.toc_list li li {
+  font-weight: normal;
+  padding-left: 10px;
+  }
+
+.toc_list li a {
+  margin-bottom: 10px;
+  }
+
+.toc_list li li a,
+.toc_list li:first-child a, /* Misc Supporters */
+.toc_list li:nth-child(2) a { /* Viewers */
+  margin-bottom: 0;
+  }
+
+.page-id-6951 h2 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  }
+
+.page-id-6951 h2:first-of-type {
+  margin-top: 0;
+  }
+
+.page-id-6951 h3 span {
+  padding-top: 20px;
+  }
+
+.page-id-6951 .content {
+  width: auto;
+  float: none;
+  }
+
+.page-id-6951 h1,
+.page-id-6951 h2,
+.page-id-6951 h3,
+.page-id-6951 p,
+.page-id-6951 .entry-utility {
+  width: 690px;
+  float: right;
+  }
+
+/* Content */
+
+.content {
+  font-size: 15px;
+  }
+
+.page-title {
+  font-size: 30px;
+  line-height: 35px;
+  margin-bottom: 20px;
+  }
+
+.entry-title,
+.entry-author {
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: normal;
+  }
+
+.entry-utility { /* edit link */
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 20px;
+  }
+
+
+/* Front */
+
+.front-title {
+  font-size: 50px;
+  margin-bottom: 30px;
+  }
+
+.home .page .entry-content {
+  font-size: 15px;
+  }
+
+.blurb {
+  float: left;
+  width: 300px;
+  margin-top: 40px;
+  margin-right: 40px;
+  }
+
+.blurb h2 {
+  font-size: 15px;
+  }
+
+.blurb .wp-post-image {
+  margin-right: 20px;
+  margin-bottom: 20px;
+  }
+
+.blurb .entry-content {
+  margin-top: 20px;
+  }
+
+#post-571 { /* Events */
+  clear: left;
+  }
+
+#post-570,
+#post-719 { /* Archive & Credits */
+  margin-right: 0;
+  }
+
+/* Chainletters */
+
+.chainletter-meta {
+  margin-bottom: 40px;
+  }
+
+.chainletter-links {
+  font-size: 13px;
+  }
+
+.chainletter-links li,
+.video-links li {
+  margin-bottom: 4px
+  }
+
+.chainletter-links li:last-child,
+.video-links li:last-child {
+  margin-bottom: 0;
+  }
+
+.booklet-image {
+  display: none;
+  }
+
+#booklet-image-0 {
+  display: inline;
+  }
+
+
+/* Videos */
+
+.video {
+  clear: left;
+  margin-bottom: 40px;
+  }
+
+.video:last-child {
+  margin-bottom: 0;
+  }
+
+.vimeo-thumbnail,
+.wp-post-image {
+  float: left;
+  margin-right: 40px;
+  }
+
+.vimeo-thumbnail { /* unlike thumbnails, these will have the wrong dimensions and need to be scaled */
+  width: 320px;
+  }
+
+.video-body {
+  float: left;
+  width: 330px;
+  margin-top: 15px;
+  font-size: 12px;
+  }
+
+.video .entry-title {
+  margin-bottom: 4px;
+  }
+
+.video .entry-content p {
+  margin: 20px 0;
+  }
+
+.video-links {
+  margin-top: 20px
+  }
+
+.vimeo-embed {
+  display: none;
+  }
+
+
+/* Fancybox */
+
+#fancybox-content {
+  width: 100%;
+  }
+
+#fancybox-title-over {
+  font-family: "Courier New", Courier, monospace;
+  }
+
+.fancybox-title-over-left {
+  display: inline-block;
+  width: 70%
+  }
+
+.fancybox-title-over strong {
+  display: block;
+  }
+
+.fancybox-title-over-right {
+  display: inline-block;
+  width: 30%;
+  text-align: right;
+  }
+
+.fancybox-title-over-right a {
+  color: white;
+  text-decoration: underline;
+  }
+
+.fancybox-title-over-right a:hover {
+  color: white;
+  text-decoration: none;
+  }
+
+
+/* Archives */
+
+.single-archive .entry-content p:last-child {
+  margin-bottom: 20px;
+  }
+
+.content .photoset-image:hover {
+  background: none;
+  }
+
+.photoset-image img {
+  margin-right: 20px;
+  margin-bottom: 20px;
+  border: solid 2px #EEE;
+  }
+
+.photoset-image img:hover {
+  border-color: #00E54A;
+  background: none;
+  }
+
+
+/* Events */
+
+.events-meta {
+  margin-bottom: 20px;
+  margin-top: 10px;
+  }
+
+.single-event .entry-photoset {
+  margin: 30px 0 20px; /* the photos themselves have an additional 20px margin-bottom */
+  }
+
+.single-event .photoset-link {
+  display: none;
+  }
+
+/* Filmmakers */
+
+.tax-filmmaker h1 {
+  margin-bottom: 40px;
+  }
+
+.filmmaker-meta {
+  margin-top: -20px;
+  margin-bottom: 40px;
+  }
+
+.filmmaker-links {
+  font-size: 13px;
+  }
+
+/* Search */
+
+.search article {
+  margin-bottom: 40px
+  }
+
+
+/* Utility */
+
+.group:after,
+.page-id-6951 .entry-content:after { /* self-clear floats */
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+  }
+
+:first-child+html .group {
+  min-height: 1px;
+  }
+
+
+/* Temp */
+
+.page-id-753 header,
+.page-id-753 footer {
+  display: none;
+  }
+
+/* hide the smiley */
+#wpstats {
+  display: none;
+  }
+
+/* hide fonts banner */
+img[alt="View all fonts in this project"] {
+  display: none;
+  }
