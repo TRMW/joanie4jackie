@@ -335,7 +335,7 @@
         echo '<a href="' . $video_url . '" class="vimeo-link" target="_blank">';
       }
       if (has_post_thumbnail()) {
-        the_post_thumbnail('large');
+        the_post_thumbnail('medium');
       } else {
         $vimeo_embed = get_vimeo_embed($video_url);
         if ($vimeo_embed) {
