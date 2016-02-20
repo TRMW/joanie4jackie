@@ -134,6 +134,15 @@ textarea {
 .wp-caption {
   font-size: 11px;
   }
+  
+/* Photo captions */
+.wp-caption-text {
+  display: none;
+}
+
+.gallery-item img {
+  border: none !important;
+}
 
 
 /* Fonts  */
@@ -357,8 +366,25 @@ input {
   margin-bottom: 40px;
   }
 
+.chainletter-meta .gallery {
+  overflow: hidden; /* clearfix */
+  margin-top: 24px !important;
+}
+    
+.chainletter-meta .gallery-item,
+.chainletter-meta .gallery > br {
+  display: none;
+}
+
+.chainletter-meta .gallery-item:first-child {
+  display: block;
+  margin: 0 !important;
+}
+
 .chainletter-links {
   font-size: 13px;
+  margin-top: 1em;
+  margin-bottom: 1em;
   }
 
 .chainletter-links li,
