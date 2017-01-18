@@ -1,5 +1,5 @@
 function formatTitle(title, currentArray, currentIndex, currentOpts) {
-  var flickrLink = $(currentArray[currentIndex]).attr('href');
+  var flickrLink = jQuery(currentArray[currentIndex]).attr('href');
   return '<span id="fancybox-title-over"><strong>' + title + '</strong><span class="fancybox-title-over-left">Image ' +  (currentIndex + 1) + ' of ' + currentArray.length + '</span><span class="fancybox-title-over-right"><a href="' + flickrLink + '" target="_blank">View Full Size</a><span></span>';
 }
 
@@ -15,7 +15,18 @@ function supportsSticky() {
   return mStyle.position.indexOf(value) !== -1;
 }
 
-$(document).ready(function() {
+function positionNowNav() {
+  if ($(this).scrollTop() >= offset.top) {
+    if (noStickySupport) $toc.addClass('fixed');
+    else if (!$toc[0].style.height) $toc.css('height', $(window).height() - 30);
+  } else {
+    if (noStickySupport) $toc.removeClass('fixed');
+    else $toc.css('height', '');
+  }
+}
+
+(function($) {
+
   // Replace video links with modal players
   if ($('.vimeo-link').length) {
     var $links = $('.vimeo-link'),
@@ -72,7 +83,8 @@ $(document).ready(function() {
   // Fetch and append archive photosets
   var $photosetContainer = $('.entry-photoset');
   if ($photosetContainer.length) {
-    photosetId = $photosetContainer.data('photoset-link').match(/[0-9]*$/);
+    // Get last string of digits, with possible trailing slash
+    photosetId = $photosetContainer.data('photoset-link').match(/([0-9]*)\/?$/)[1];
 
     $.get('https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=4c32dbf63d7deabd1ec94d208d0961c0&photoset_id=' + photosetId + '&extras=url_s,url_o&format=json&nojsoncallback=1', function(response) {
       for (var i = 0; i < response.photoset.photo.length; i++) {
@@ -92,20 +104,10 @@ $(document).ready(function() {
       offset = $toc.offset(),
       noStickySupport = !supportsSticky();
 
-  function positionNowNav() {
-    if ($(this).scrollTop() >= offset.top) {
-      if (noStickySupport) $toc.addClass('fixed');
-      else if (!$toc[0].style.height) $toc.css('height', $(window).height() - 30);
-    } else {
-      if (noStickySupport) $toc.removeClass('fixed');
-      else $toc.css('height', '');
-    }
-  }
-
   if ($toc.length) {
     if (noStickySupport) $toc.css('left', offset.left + 'px');
     positionNowNav();
     $(document).on('scroll', positionNowNav);
   }
 
-});
+})(jQuery);
