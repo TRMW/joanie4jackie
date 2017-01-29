@@ -613,41 +613,6 @@ iframe[src*="vimeo"] {
   }
 }
 
-/* Fancybox */
-
-#fancybox-content {
-  width: 100%;
-}
-
-#fancybox-title-over {
-  font-family: "Courier New", Courier, monospace;
-}
-
-.fancybox-title-over-left {
-  display: inline-block;
-  width: 70%
-}
-
-.fancybox-title-over strong {
-  display: block;
-}
-
-.fancybox-title-over-right {
-  display: inline-block;
-  width: 30%;
-  text-align: right;
-}
-
-.fancybox-title-over-right a {
-  color: white;
-  text-decoration: underline;
-}
-
-.fancybox-title-over-right a:hover {
-  color: white;
-  text-decoration: none;
-}
-
 
 /* Archives */
 
