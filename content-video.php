@@ -4,7 +4,8 @@
     <?php echo wp_video_shortcode(array(
       'src' => get_the_post_video_url(),
       'poster' => get_the_post_thumbnail_url(),
-      'width' => 320
+      'width' => 320,
+      'height' => 240
     )); ?>
   </div>
 
