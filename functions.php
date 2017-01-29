@@ -1,32 +1,6 @@
 <?php
 
-
-define( 'WP_DEBUG', true );
-// function my_pre_get_posts( $query ) {
-//   // do not modify queries in the admin
-//   if( is_admin() ) {
-//     return $query;
-//   }
-
-//   // only modify queries for 'event' post type
-//   if( isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'now_response' ) {
-
-//     // allow the url to alter the query
-//     if( isset($_GET['response_chainletter']) ) {
-//       // echo('<h1>hello there:' . $_GET['response_chainletter'] . '</h1>');
-//       $query->set('meta_key', 'response_chainletter');
-//       $query->set('meta_value', $_GET['response_chainletter']);
-//     }
-//     if( isset($_GET['chainletter_video']) ) {
-//       // echo('<h1>hello there:' . $_GET['chainletter'] . '</h1>');
-//       $query->set('meta_key', 'chainletter_video');
-//       $query->set('meta_value', $_GET['chainletter_video']);
-//     }
-//   }
-
-//   // return
-//   return $query;
-// }
+// define( 'WP_DEBUG', true );
 
 function get_term_galleries($term_id) {
   $term_description = get_term($term_id)->description;
