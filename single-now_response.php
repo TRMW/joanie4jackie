@@ -26,14 +26,17 @@
     <div class="now-header">
       <h1 class="page-title">Where is She Now?</h1>
       <?php
+        $now_response_taxonomy = null;
         $now_response_taxonomies = array_keys(get_the_taxonomies());
         if (in_array('chainletter', $now_response_taxonomies)) {
           $now_response_taxonomy = 'chainletter';
         } elseif (in_array('costar', $now_response_taxonomies)) {
           $now_response_taxonomy = 'costar';
         }
-        $now_response_tapes = get_the_terms(get_the_ID(), $now_response_taxonomy);
-        $now_response_tape = $now_response_tapes[0];
+        if ($now_response_taxonomy) {
+          $now_response_tapes = get_the_terms(get_the_ID(), $now_response_taxonomy);
+          $now_response_tape = $now_response_tapes[0];
+        }
       ?>
       <h2 class="now-section-heading">
         <?php if ($now_response_taxonomy == 'chainletter') : ?>
