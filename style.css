@@ -258,18 +258,15 @@ input {
 
 /* Sidebar */
 
-.sidebar,
-.toc_list {
+.sidebar {
   margin-left: -5px; /* counteract inline-block on links and line up with header */
 }
 
-.sidebar li,
-.toc_list li {
+.sidebar li {
   margin-bottom: 10px;
 }
 
-.sidebar a,
-.toc_list a {
+.sidebar a {
   display: inline-block;
 }
 
@@ -322,95 +319,6 @@ input {
   font-weight: bold;
 }
 
-.page-id-6951 h2 {
-  margin-top: 30px;
-  margin-bottom: 10px;
-}
-
-.page-id-6951 h2:first-of-type {
-  margin-top: 0;
-}
-
-.page-id-6951 h3 span {
-  padding-top: 20px;
-}
-
-.page-id-6951 .content {
-  width: auto;
-  float: none;
-}
-
-#toc_container {
-  position: -webkit-sticky;
-  position: -moz-sticky;
-  position: -ms-sticky;
-  position: -o-sticky;
-  position: sticky;
-  top: 0;
-  float: left;
-  margin-top: -20px;
-  padding: 20px 0 10px;
-  width: 250px;
-  font-size: 12px; /* otherwise it'll inherit the larger content font-size */
-  overflow-y: auto;
-}
-
-#toc_container.fixed {
-  position: fixed;
-  top: 20px;
-  bottom: 0;
-}
-
-#toc_container a {
-  text-decoration: none;
-  padding: 5px;
-}
-
-.toc_list li {
-  font-weight: bold;
-}
-
-.toc_list li li {
-  font-weight: normal;
-  padding-left: 10px;
-}
-
-.toc_list li a {
-  margin-bottom: 10px;
-}
-
-.toc_list li li a,
-.toc_list li:first-child a, /* Misc Supporters */
-.toc_list li:nth-child(2) a { /* Viewers */
-  margin-bottom: 0;
-}
-
-.page-id-6951 h2 {
-  margin-top: 30px;
-  margin-bottom: 10px;
-}
-
-.page-id-6951 h2:first-of-type {
-  margin-top: 0;
-}
-
-.page-id-6951 h3 span {
-  padding-top: 20px;
-}
-
-.page-id-6951 .content {
-  width: auto;
-  float: none;
-}
-
-.page-id-6951 h1,
-.page-id-6951 h2,
-.page-id-6951 h3,
-.page-id-6951 p,
-.page-id-6951 .entry-utility {
-  width: 690px;
-  float: right;
-}
 
 /* Content */
 
