@@ -704,12 +704,13 @@ iframe[src*="vimeo"] {
   }
 }
 
+/* 360 = 320 medium image width + 20px content padding * 2 */
 @media screen and (max-width: 360px) {
   .gallery-size-medium .gallery-item {
     margin-right: 0;
   }
 
-  img.attachment-medium.size-medium {
+  img.size-medium {
     max-width: 100%;
     height: auto;
   }
