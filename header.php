@@ -33,7 +33,7 @@
         <?php endif; ?>
         <nav class="nav">
           <?php wp_nav_menu(array('container' => '')); ?>
-          <form role="search" method="get" class="search-form"  action="http://v2.joanie4jackie.com/">
+          <form role="search" method="get" class="search-form" action="/">
             <input type="text" value="" name="s" id="search-input" placeholder="Search">
           </form>
         </nav>
