@@ -461,6 +461,10 @@ function natural_language_join(array $list, $conjunction = 'and') {
 function the_linked_filmmaker_names($should_link = true) {
   $filmmaker_terms = get_the_terms(get_the_ID(), 'filmmaker');
 
+  if (!is_array($filmmaker_terms)) {
+    return;
+  }
+
   if ($should_link) {
     $filmmakers = array_map("get_linked_filmmaker_name", $filmmaker_terms);
   } else {
@@ -563,7 +567,7 @@ function the_filmmaker_links() {
       foreach($filmmakers as $filmmaker ) {
         $filmmaker_website = get_field('filmmaker_website', $filmmaker);
         if($filmmaker_website) {
-          $filmmaker_links .= '<li><a href="' . $filmmaker_website . '">' . (count($filmmakers) > 1 ? $filmmaker->name : 'Filmmaker') . '\'s Website &raquo;</a></li>';
+          $filmmaker_links .= '<li><a href="' . $filmmaker_website . '">Filmmaker’s Website' . (count($filmmakers) > 1 ? ' (' . $filmmaker->name . ')' : '') . ' &raquo;</a></li>';
         }
 
         $now_response = get_posts(array(
@@ -716,7 +720,7 @@ function get_taxonomy_sidebar() {
 
     $pagination = array(
       'previous' => isset($current_index) && $current_index > 0 ? $terms[$current_index - 1] : null,
-      'next' => isset($current_index) && $current_index < count($terms) ? $terms[$current_index + 1] : null
+      'next' => isset($current_index) && $current_index < (count($terms) - 1) ? $terms[$current_index + 1] : null
     );
 
     $sidebar_object = array('dom' => $sidebar_dom, 'pagination' => $pagination);
@@ -787,6 +791,7 @@ function get_post_type_sidebar() {
 
   echo('<nav class="sidebar"><ul>');
   foreach($sidebar_posts as $i => $sidebar_post) {
+    $year = '';
     if ($post_type == 'event') {
       $meta = get_post_meta($sidebar_post->ID);
       // $year = DateTime::createFromFormat('Ymd', get_field('event_start_date', $sidebar_post->ID))->format('Y ');
@@ -802,8 +807,8 @@ function get_post_type_sidebar() {
   echo('</ul></nav>');
 
   $pagination = array(
-    'previous' => $sidebar_posts[$current_index - 1],
-    'next' => $sidebar_posts[$current_index + 1]
+    'previous' => isset($current_index) && $current_index > 0 ? $sidebar_posts[$current_index - 1] : null,
+    'next' => isset($current_index) && $current_index < count($sidebar_posts) - 1 ? $sidebar_posts[$current_index + 1] : null,
   );
   return $pagination;
 }
