@@ -144,10 +144,14 @@ function remove_video_thumbnails($hits) {
   return $hits;
 }
 
-function alaphabetical_now_posts($query) {
+function j4j_pre_get_posts($query) {
   if ($query->is_post_type_archive('now_response')) {
+    // alphabetical!
     $query->set('orderby', 'title');
     $query->set('order', 'ASC');
+  } else if ($query->is_tax('filmmaker')) {
+    // We only want videos, not now_responses
+    $query->set('post_type', 'video');
   }
 }
 
@@ -158,7 +162,7 @@ add_action('save_post_video', 'delete_video_transients', 10 ,3);
 add_action('save_post_now_response', 'delete_now_response_transients', 10, 3);
 add_action('save_post_archive', 'set_post_attachments', 10, 3);
 add_action('save_post_event', 'set_post_attachments', 10, 3);
-add_action('pre_get_posts', 'alaphabetical_now_posts');
+add_action('pre_get_posts', 'j4j_pre_get_posts');
 
 // add_action('pre_get_posts', 'my_pre_get_posts');
 add_action('init', 'j4j_registrations');

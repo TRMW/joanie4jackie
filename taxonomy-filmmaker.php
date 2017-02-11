@@ -35,9 +35,7 @@
 
     <?php while (have_posts()) : the_post(); ?>
       <?php // only show videos with this filmmaker tag (not Now interviews) ?>
-      <?php if (get_post_type() == 'video') : ?>
-        <?php get_template_part('content', 'video'); ?>
-      <?php endif; ?>
+      <?php get_template_part('content', 'video'); ?>
     <?php endwhile; ?>
 
   </section>
