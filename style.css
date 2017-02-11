@@ -37,8 +37,21 @@ body {
   position: relative;
 }
 
+.showing-mobile-nav .front-title {
+  margin-top: 0;
+}
+
 .home .main {
   margin-top: 30px;
+}
+
+.home .header .nav,
+.home .footer .nav {
+  display: none;
+}
+
+.home .footer .site-title {
+  display: none;
 }
 
 .sidebar {
@@ -102,7 +115,7 @@ a:active,
 a:hover,
 .content a:active,
 .content a:hover,
-.current-menu-item a {
+.current-menu-item > a {
   color: black;
   background-color: #ffdccc;
 }
@@ -221,7 +234,8 @@ input {
 }
 
 @media screen and (max-width: 1020px) {
-  .site-title {
+  .site-title,
+  .showing-mobile-nav .front-title {
     height: auto;
   }
 }
@@ -404,6 +418,7 @@ input {
 /* the entire blurb is linked */
 .blurb .entry-content a {
   background-color: transparent;
+  text-decoration: none;
 }
 
 /* 3 up */
@@ -826,30 +841,22 @@ img[alt="View all fonts in this project"] {
 
 /* Mobile Nav */
 
-.mobile-menu-toggle,
-.mobile-menu-toggle:visited {
+.mobile-menu-toggle {
+  cursor: pointer;
   display: none;
   position: fixed;
   top: 0;
   right: 0;
   padding: 10px;
   background: black;
-  color: white;
-  font-weight: bold;
-  font-size: 15px;
   z-index: 1;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
 }
 
-.mobile-menu-close {
-  display: none;
-}
-
-.showing-mobile-nav .mobile-menu-label {
-  display: none;
-}
-
-.showing-mobile-nav .mobile-menu-close {
-  display: block;
+.mobile-menu-toggle svg {
+  vertical-align: middle;
 }
 
 @media screen and (max-width: 1020px) {
@@ -859,7 +866,7 @@ img[alt="View all fonts in this project"] {
 
   .nav,
   .sidebar,
-  .footer {
+  .header .search-form {
     display: none;
   }
 
@@ -872,22 +879,20 @@ img[alt="View all fonts in this project"] {
     width: auto;
   }
 
-  .header .nav {
-    padding-bottom: 20px;
-  }
-
   .header .nav,
   .sidebar {
     font-size: 15px;
   }
 
   .header .site-title,
+  .header .front-title,
   .header .nav li {
     margin-bottom: 10px;
   }
 
   .header .nav li {
     display: list-item;
+    margin-right: 0;
   }
 
   .header .nav a {
@@ -900,9 +905,40 @@ img[alt="View all fonts in this project"] {
 
   /* These are normally inline-block */
   .header .site-title,
-  .header .nav ul,
-  .header .search-form {
+  .header .nav ul {
     display: block;
+  }
+
+  #menu-j4j-menu > li > a,
+  #menu-j4j-menu .now-sidebar__section__title > a {
+    font-weight: bold;
+  }
+
+  #menu-j4j-menu > li.current-menu-item > a {
+    background-color: transparent;
+  }
+
+  #menu-j4j-menu > .current-menu-item > ul {
+    margin-left: 20px;
+  }
+
+  #menu-j4j-menu ul {
+    margin-top: 10px;
+  }
+
+  .footer {
+    margin-top: 20px; /* preceding sidebar li has 10px bottom margin */
+  }
+
+  .footer .site-title,
+  .footer .page-title,
+  .footer .menu {
+    display: none;
+  }
+
+  .footer #search-input {
+    width: 100%;
+    font-size: 15px;
   }
 }
 
@@ -915,23 +951,21 @@ img[alt="View all fonts in this project"] {
   display: none;
 }
 
-body.showing-mobile-nav {
-  background-color: black;
-  color: white;
+.showing-mobile-nav .header .site-title,
+.showing-mobile-nav .header .front-title {
+  margin-bottom: 30px;
 }
 
-.showing-mobile-nav a,
-.showing-mobile-nav a:visited {
-  color: white;
+.showing-mobile-nav .front-title {
+  font-size: 20px;
+  padding-left: 5px; /* matched linked .site-titles */
 }
 
-.showing-mobile-nav .current-menu-item a,
-.showing-mobile-nav .current-menu-item a:visited,
-.showing-mobile-nav a:active {
-  background-color: black;
-  border: solid 1px white;
+.showing-mobile-nav .main {
+  margin-top: 0;
 }
 
-.showing-mobile-nav  .main {
-  margin-top: 20px;
+.showing-mobile-nav .footer .nav,
+.showing-mobile-nav .footer .search-form {
+  display: block;
 }

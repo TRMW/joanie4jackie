@@ -19,28 +19,29 @@
 
   <body <?php body_class(); ?>>
     <div class="container">
-      <?php if (is_front_page()) : ?>
-        <h1 class="front-title">
-          <?php bloginfo( 'name' ); ?>
-        </h1>
-      <?php else : ?>
-        <header class="header">
+      <header class="header">
+        <?php if (is_front_page()) : ?>
+          <h1 class="front-title">
+            <?php bloginfo('name'); ?>
+          </h1>
+        <?php else : ?>
           <div class="site-title">
-            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
-              <?php bloginfo( 'name' ); ?>
+            <a href="<?php echo esc_url(home_url('/')); ?>" rel="home">
+              <?php bloginfo('name'); ?>
             </a>
           </div>
-          <nav class="nav">
-            <?php wp_nav_menu(array('container' => '')); ?>
-            <form role="search" method="get" class="search-form" action="http://v2.joanie4jackie.com/">
-              <input type="text" value="" name="s" id="search-input" placeholder="Search">
-            </form>
-          </nav>
-          <a class="mobile-menu-toggle" href="#" onclick="document.body.classList.toggle('showing-mobile-nav')">
-            <span class="mobile-menu-label">Menu</span>
-            <span class="mobile-menu-close">Close</span>
-          </a>
-        </header>
-      <?php endif; ?>
+        <?php endif; ?>
+        <nav class="nav">
+          <?php wp_nav_menu(array('container' => '')); ?>
+          <form role="search" method="get" class="search-form"  action="http://v2.joanie4jackie.com/">
+            <input type="text" value="" name="s" id="search-input" placeholder="Search">
+          </form>
+        </nav>
+        <div class="mobile-menu-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24">
+            <path fill="white" fill-rule="evenodd" clip-rule="evenodd" d="M0 10h32v4H0v-4zM0 20h32v4H0v-4zM0 0h32v4H0V0z"></path>
+          </svg>
+        </div>
+      </header>
 
       <div class="main group">
