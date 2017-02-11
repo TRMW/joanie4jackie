@@ -164,7 +164,6 @@ add_action('save_post_archive', 'set_post_attachments', 10, 3);
 add_action('save_post_event', 'set_post_attachments', 10, 3);
 add_action('pre_get_posts', 'j4j_pre_get_posts');
 
-// add_action('pre_get_posts', 'my_pre_get_posts');
 add_action('init', 'j4j_registrations');
 add_action('init', 'add_j4j_rewrite_rules');
 add_action('generate_rewrite_rules', 'setup_taxonomy_index_rules');
