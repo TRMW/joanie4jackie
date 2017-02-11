@@ -171,7 +171,6 @@ add_action('edited_chainletter', 'flush_rewrite_rules');
 add_action('edited_costar', 'flush_rewrite_rules');
 add_action('admin_menu', 'j4j_admin_menu_tweaks');
 add_action('admin_bar_menu', 'j4j_admin_bar_menu_tweaks', 999);
-add_action('template_redirect','j4j_auth');
 
 add_filter( 'nav_menu_css_class', 'set_active_menu_class', 10, 2 );
 add_filter('relevanssi_hits_filter', 'remove_video_thumbnails');
@@ -374,25 +373,6 @@ function set_active_menu_class($classes , $item){
   }
 
   return $classes;
-}
-
-function j4j_auth() {
-  global $wp_query;
-  nocache_headers();
-
-  if ( is_user_logged_in() || $wp_query->query_vars['pagename'] == 'participant-information-form')
-    return;
-
-  $user = isset($_SERVER["PHP_AUTH_USER"]) ? $_SERVER["PHP_AUTH_USER"] : '';
-  $pwd  = isset($_SERVER["PHP_AUTH_PW"])   ? $_SERVER["PHP_AUTH_PW"]   : '';
-  if ( !is_wp_error(wp_authenticate($user, $pwd)) ) {
-    return;
-  }
-
-  header('WWW-Authenticate: Basic');
-  header('HTTP/1.0 401 Unauthorized');
-  echo 'Authorization Required';
-  die();
 }
 
 // Link /chainletter and /costar to the first tape in those categories
