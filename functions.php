@@ -224,8 +224,8 @@ function add_j4j_rewrite_rules() {
     'top'
   );
   add_rewrite_rule(
-    '^archive/?$',
-    'index.php?archive=notes-and-letters',
+    '^documents/?$',
+    'index.php?archive=posters',
     'top'
   );}
 
@@ -264,7 +264,8 @@ function j4j_registrations() {
         'not_found_in_trash' => 'No archives found in trash'
       ),
       'public' => true,
-      'menu_position' => 5
+      'menu_position' => 5,
+      'rewrite' => array('slug' => 'documents'),
     )
   );
 
@@ -384,14 +385,15 @@ function set_active_menu_class($classes , $item){
     case '/co-star-tapes/':
       $is_current = is_tax('costar') && !is_post_type_archive('now_response');
       break;
-    case '/archive/':
+    case '/documents/':
       $is_current = get_post_type() == 'archive';
       break;
-    case '/event/':
+    case '/events/':
       $is_current = get_post_type() == 'event';
       break;
     case '/now/':
-      $is_current = is_post_type_archive('now_response');
+      global $wp_query;
+      $is_current = is_post_type_archive('now_response') || $wp_query->query_vars['post_type'] == 'now_response';
       break;
   }
 
