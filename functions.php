@@ -442,8 +442,18 @@ function j4j_admin_bar_menu_tweaks() {
 
 // Template Helper Functions
 
+// Using this instead of `get_term_link` saves us a database query,
+// since `get_term_link` immediately calls `get_term_by` and we don't.
+function fast_get_term_link($term, $taxonomy) {
+  global $wp_rewrite;
+  // Returns the rewrite pattern i.e. "/co-star/%costar%" for costars
+  $rewrite_pattern = $wp_rewrite->get_extra_permastruct($taxonomy);
+  $chainletter_link = str_replace("%$taxonomy%", $term->slug, $rewrite_pattern);
+  return home_url(user_trailingslashit($chainletter_link, 'category'));
+}
+
 function get_linked_filmmaker_name($term) {
-  return '<a href="' . get_term_link($term->slug, 'filmmaker') . '" class="filmmaker-page-link">' . $term->name . '</a>';
+  return '<a href="' . fast_get_term_link($term, 'filmmaker') . '" class="filmmaker-page-link">' . $term->name . '</a>';
 }
 
 /**
@@ -483,7 +493,7 @@ function the_other_video_text($other_video) {
   }
   if ($other_video_taxonomy) {
     $filmmaker_other_videos_chainletters = get_the_terms($other_video, $other_video_taxonomy);
-    return '<em>' . $other_video->post_title . '</em> on <em><a href="' . get_term_link($filmmaker_other_videos_chainletters[0]->slug, $other_video_taxonomy) . '">' . $filmmaker_other_videos_chainletters[0]->name . '</a></em>';
+    return '<em>' . $other_video->post_title . '</em> on <em><a href="' . fast_get_term_link($filmmaker_other_videos_chainletters[0], $other_video_taxonomy) . '">' . $filmmaker_other_videos_chainletters[0]->name . '</a></em>';
   }
 }
 
@@ -599,7 +609,7 @@ function the_video_chainletter_links($wrapper_tag) {
       $html = 'Appears on ';
 
       foreach ($tapes as $i => $tape) {
-        $html .= '<a href="' . get_term_link($tape) . '">' . $tape->name . '</a> ('. substr(get_field('chainletter_fulfilled_date', $tape), 0, 4) . ')';
+        $html .= '<a href="' . fast_get_term_link($tape, $tape->taxonomy) . '">' . $tape->name . '</a> ('. substr(get_field('chainletter_fulfilled_date', $tape), 0, 4) . ')';
         if ($i < count($tapes) - 1) {
           $html .= ', ';
         }
@@ -702,7 +712,6 @@ function get_taxonomy_sidebar() {
 
   if (false === ($sidebar_object = get_transient($transient_key))) {
     $terms = get_taxonomy_terms_by_custom_date($taxonomy);
-    $current_term = get_term_by('slug', $current_term_slug, $taxonomy);
     $bard_chainletter_ids = array(
       92, // The Newborn Chainletter
       245, // The Frozen Chainletter
@@ -712,8 +721,8 @@ function get_taxonomy_sidebar() {
 
     $sidebar_dom = '<ul>';
       foreach ($terms as $i => $term) {
-        $is_current = $term->slug == $current_term->slug;
-        $sidebar_dom .= '<li class="menu-item'  . ($is_current ? ' current-menu-item' : '') . (in_array($term->term_id, $bard_chainletter_ids) ? ' bard-chainletter' : '') . '"><a href="' . get_term_link($term->slug, $taxonomy) . '">' . substr($term->date, 0, 4) . ' ' . $term->name . '</a></li>';
+        $is_current = $term->slug == $current_term_slug;
+        $sidebar_dom .= '<li class="menu-item'  . ($is_current ? ' current-menu-item' : '') . (in_array($term->term_id, $bard_chainletter_ids) ? ' bard-chainletter' : '') . '"><a href="' . fast_get_term_link($term, $taxonomy) . '">' . substr($term->date, 0, 4) . ' ' . $term->name . '</a></li>';
         if ($is_current) { $current_index = $i; }
       }
     $sidebar_dom .= '</ul>';
