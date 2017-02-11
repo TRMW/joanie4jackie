@@ -185,7 +185,7 @@ function add_j4j_rewrite_rules() {
     'top'
   );
   add_rewrite_rule(
-    '^now/costar/([^/]*)/?',
+    '^now/co-star/([^/]*)/?',
     'index.php?post_type=now_response&costar=$matches[1]',
     'top'
   );
@@ -320,6 +320,7 @@ function j4j_registrations() {
       'menu_name' =>  'Co-Star Tapes',
       'popular_items' => NULL
     ),
+    'rewrite' => array('slug' => 'co-star'),
     'show_admin_column' => true
   ));
 
@@ -351,7 +352,7 @@ function set_active_menu_class($classes , $item){
     case '/chainletter-tapes/':
       $is_current = is_tax('chainletter') && !is_post_type_archive('now_response');
       break;
-    case '/costar-tapes/':
+    case '/co-star-tapes/':
       $is_current = is_tax('costar') && !is_post_type_archive('now_response');
       break;
     case '/archive/':
@@ -406,7 +407,7 @@ function setup_taxonomy_index_rules($wp_rewrite) {
 
   $taxonomy_index_rules = array(
     'chainletter-tapes/?$' => 'index.php?chainletter=' . $chainletters[0]->slug,
-    'costar-tapes/?$' => 'index.php?costar=' . $costars[0]->slug,
+    'co-star-tapes/?$' => 'index.php?costar=' . $costars[0]->slug,
     'events/?$' => 'index.php?event=' . $events[0]->post_name
   );
 
@@ -582,8 +583,7 @@ function the_video_chainletter_links($wrapper_tag) {
       $html = 'Appears on ';
 
       foreach ($tapes as $i => $tape) {
-        // $fulfilled_date = DateTime::createFromFormat('Ymd', get_field('chainletter_fulfilled_date', $acg_id));
-        $html .= '<a href="/' . $tape->taxonomy . '/' . $tape->slug . '/">' . $tape->name . '</a> ('. substr(get_field('chainletter_fulfilled_date', $tape), 0, 4) . ')';
+        $html .= '<a href="' . get_term_link($tape) . '">' . $tape->name . '</a> ('. substr(get_field('chainletter_fulfilled_date', $tape), 0, 4) . ')';
         if ($i < count($tapes) - 1) {
           $html .= ', ';
         }
@@ -716,7 +716,8 @@ function get_taxonomy_sidebar() {
 }
 
 function get_the_now_link($term, $taxonomy) {
-  return '/now/' . $taxonomy . '/' . $term->slug . '/';
+  $taxonomy_slug = $taxonomy === 'costar' ? 'co-star' : 'chainletter';
+  return '/now/' . $taxonomy_slug . '/' . $term->slug . '/';
 }
 
 function get_now_sidebar_section_items($taxonomy) {
