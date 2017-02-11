@@ -829,11 +829,6 @@ body .jp-carousel-close-hint span {
   display: none;
 }
 
-/* hide the smiley */
-#wpstats {
-  display: none;
-}
-
 /* hide fonts banner */
 img[alt="View all fonts in this project"] {
   display: none;
