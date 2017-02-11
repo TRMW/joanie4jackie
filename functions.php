@@ -713,7 +713,7 @@ function get_taxonomy_sidebar() {
     $sidebar_dom = '<ul>';
       foreach ($terms as $i => $term) {
         $is_current = $term->slug == $current_term->slug;
-        $sidebar_dom .= '<li'  . ($is_current ? ' class="current-menu-item">' : '>') . '<a href="' . get_term_link($term->slug, $taxonomy) . '">' . substr($term->date, 0, 4) . ' ' . $term->name . (in_array($term->term_id, $bard_chainletter_ids) ? '*' : '') . '</a></li>';
+        $sidebar_dom .= '<li class="menu-item'  . ($is_current ? ' current-menu-item' : '') . (in_array($term->term_id, $bard_chainletter_ids) ? ' bard-chainletter' : '') . '"><a href="' . get_term_link($term->slug, $taxonomy) . '">' . substr($term->date, 0, 4) . ' ' . $term->name . '</a></li>';
         if ($is_current) { $current_index = $i; }
       }
     $sidebar_dom .= '</ul>';

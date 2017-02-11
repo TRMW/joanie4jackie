@@ -284,6 +284,13 @@ input {
   display: inline-block;
 }
 
+/* Only show asterisk on desktop, since .bard-note is hidden on mobile */
+@media screen and (min-width: 1020px) {
+  .bard-chainletter::after {
+    content: "*"
+  }
+}
+
 .bard-note {
   margin-top: 20px;
   font-size: 10px;
