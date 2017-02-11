@@ -4,24 +4,28 @@
 
     <h1 class="page-title">Films by <?php echo get_queried_object()->name; ?></h1>
 
-    <?php if (get_field('filmmaker_website', get_queried_object())) : ?>
+    <?php
+      $website = get_field('filmmaker_website', get_queried_object());
+      $now_response = get_posts(array(
+        'numberposts' => 1,
+        'post_type' => 'now_response',
+        'tax_query' => array(array(
+          'taxonomy' => 'filmmaker',
+          'field' => 'term_id',
+          'terms' => get_queried_object()->term_id
+      ))));
+    ?>
+
+    <?php if ($website || $now_response) : ?>
       <div class="entry-meta filmmaker-meta">
         <ul class="filmmaker-links">
-          <li>
-            <a href="<?php the_field('filmmaker_website', get_queried_object()); ?>">
-              Filmmaker's Website &raquo;
-            </a>
-          </li>
-          <?php
-            $now_response = get_posts(array(
-              'numberposts' => 1,
-              'post_type' => 'now_response',
-              'tax_query' => array(array(
-                'taxonomy' => 'filmmaker',
-                'field' => 'term_id',
-                'terms' => get_queried_object()->term_id
-            ))));
-          ?>
+          <?php if ($website) : ?>
+            <li>
+              <a href="<?php echo $website; ?>">
+                Filmmaker’s Website &raquo;
+              </a>
+            </li>
+          <?php endif; ?>
           <?php if ($now_response) : ?>
             <li>
               <a href="<?php the_permalink($now_response[0]) ?>">
