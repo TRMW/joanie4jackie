@@ -435,7 +435,7 @@ function j4j_admin_menu_tweaks() {
 
 function j4j_admin_bar_menu_tweaks() {
   global $wp_admin_bar;
-  // $wp_admin_bar->remove_node( 'new-post' );
+  $wp_admin_bar->remove_node( 'new-post' );
   $wp_admin_bar->remove_node( 'new-link' );
   // $wp_admin_bar->remove_node( 'new-media' );
 }
