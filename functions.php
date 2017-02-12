@@ -681,30 +681,6 @@ function get_taxonomy_terms_by_custom_date($taxonomy, $term_fields = null, $limi
   return $terms;
 }
 
-// This is only needed because not all tapes have Now responses, so we need to do extra
-// work to only retrieve those that do. The only one that doesn't is Break My
-// Chainletter, so we can switch to using the regular get_taxonomy_terms_by_custom_date
-// if that tape ever gets responses.
-function get_now_taxonomy_terms_by_custom_date($taxonomy, $term_fields = null, $limit = false) {
-  global $wpdb;
-  $term_fields = is_array($term_fields) ? implode(', ', $term_fields) : '*';
-  $date_field = 'chainletter_fulfilled_date';
-  $orderby = 'date';
-
-  $query = "SELECT $wpdb->terms." . $term_fields . ", option_value AS date
-            FROM $wpdb->term_taxonomy
-            JOIN $wpdb->terms ON $wpdb->terms.term_id = $wpdb->term_taxonomy.term_id
-            JOIN $wpdb->options ON $wpdb->options.option_name = CONCAT_WS('_', '" . $taxonomy . "', $wpdb->term_taxonomy.term_id, '" . $date_field ."')
-            JOIN $wpdb->term_relationships ON $wpdb->term_relationships.term_taxonomy_id = $wpdb->term_taxonomy.term_taxonomy_id
-            JOIN $wpdb->posts ON $wpdb->posts.ID = $wpdb->term_relationships.object_id
-            WHERE $wpdb->term_taxonomy.taxonomy = '" . $taxonomy . "'
-            AND $wpdb->posts.post_type = 'now_response'
-            GROUP BY slug
-            ORDER BY " . $orderby .
-            ($limit ? (" LIMIT " . $limit) : "");
-  return $wpdb->get_results($query);
-}
-
 function get_taxonomy_sidebar() {
   $taxonomy = get_queried_object()->taxonomy;
   $current_term_slug = get_query_var('term') ? get_query_var('term'): $terms[0]->slug;
@@ -749,7 +725,7 @@ function get_now_sidebar_section_items($taxonomy) {
   $transient_key = 'now_sidebar_items_' . $taxonomy . '_' . get_queried_object()->slug;
 
   if (false === ($sidebar_items_object = get_transient($transient_key))) {
-    $terms = get_now_taxonomy_terms_by_custom_date($taxonomy, array('name', 'slug'));
+    $terms = get_taxonomy_terms_by_custom_date($taxonomy, array('name', 'slug'));
     $sidebar_dom = '';
 
     foreach ($terms as $i => $term) {
