@@ -442,14 +442,24 @@ function j4j_admin_bar_menu_tweaks() {
 
 // Template Helper Functions
 
+function get_term_path($term, $taxonomy) {
+  global $wp_rewrite;
+  // Returns the rewrite pattern i.e. "/co-star/%costar%" for costars
+  // Note that this is a global object, so it doesn't hit the db
+  $rewrite_pattern = $wp_rewrite->get_extra_permastruct($taxonomy);
+  return str_replace("%$taxonomy%", $term->slug, $rewrite_pattern);
+}
+
 // Using this instead of `get_term_link` saves us a database query,
 // since `get_term_link` immediately calls `get_term_by` and we don't.
 function fast_get_term_link($term, $taxonomy) {
-  global $wp_rewrite;
-  // Returns the rewrite pattern i.e. "/co-star/%costar%" for costars
-  $rewrite_pattern = $wp_rewrite->get_extra_permastruct($taxonomy);
-  $chainletter_link = str_replace("%$taxonomy%", $term->slug, $rewrite_pattern);
-  return home_url(user_trailingslashit($chainletter_link, 'category'));
+  $term_path = get_term_path($term, $taxonomy);
+  return home_url(user_trailingslashit($term_path, 'category'));
+}
+
+function get_the_now_link($term, $taxonomy) {
+  $now_path = '/now/' . get_term_path($term, $taxonomy);
+  return home_url(user_trailingslashit($now_path, 'category'));
 }
 
 function get_linked_filmmaker_name($term) {
@@ -714,11 +724,6 @@ function get_taxonomy_sidebar() {
 
   echo($sidebar_object['dom']);
   return $sidebar_object['pagination'];
-}
-
-function get_the_now_link($term, $taxonomy) {
-  $taxonomy_slug = $taxonomy === 'costar' ? 'co-star' : 'chainletter';
-  return '/now/' . $taxonomy_slug . '/' . $term->slug . '/';
 }
 
 function get_now_sidebar_section_items($taxonomy) {
