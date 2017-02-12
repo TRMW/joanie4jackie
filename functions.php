@@ -666,15 +666,15 @@ function the_video_thumbnail() {
 
 function get_taxonomy_terms_by_custom_date($taxonomy, $term_fields = null, $limit = false) {
   global $wpdb;
-  $term_fields = is_array($term_fields) ? implode(', ', $term_fields) : 'wp_terms.*';
+  $term_fields = is_array($term_fields) ? implode(', ', $term_fields) : '*';
   $date_field = 'chainletter_fulfilled_date';
   $orderby = 'date';
 
-  $query = "SELECT " . $term_fields . ", option_value AS date
-            FROM wp_term_taxonomy
-            JOIN wp_terms ON wp_terms.term_id = wp_term_taxonomy.term_id
-            JOIN wp_options ON wp_options.option_name = CONCAT_WS('_', '" . $taxonomy . "', wp_term_taxonomy.term_id, '" . $date_field ."')
-            WHERE wp_term_taxonomy.taxonomy = '" . $taxonomy . "'
+  $query = "SELECT $wpdb->terms." . $term_fields . ", option_value AS date
+            FROM $wpdb->term_taxonomy
+            JOIN $wpdb->terms ON $wpdb->terms.term_id = $wpdb->term_taxonomy.term_id
+            JOIN $wpdb->options ON $wpdb->options.option_name = CONCAT_WS('_', '" . $taxonomy . "', $wpdb->term_taxonomy.term_id, '" . $date_field ."')
+            WHERE $wpdb->term_taxonomy.taxonomy = '" . $taxonomy . "'
             ORDER BY " . $orderby .
             ($limit ? (" LIMIT " . $limit) : "");
   $terms = $wpdb->get_results($query);
@@ -687,18 +687,18 @@ function get_taxonomy_terms_by_custom_date($taxonomy, $term_fields = null, $limi
 // if that tape ever gets responses.
 function get_now_taxonomy_terms_by_custom_date($taxonomy, $term_fields = null, $limit = false) {
   global $wpdb;
-  $term_fields = is_array($term_fields) ? implode(', ', $term_fields) : 'wp_terms.*';
+  $term_fields = is_array($term_fields) ? implode(', ', $term_fields) : '*';
   $date_field = 'chainletter_fulfilled_date';
   $orderby = 'date';
 
-  $query = "SELECT " . $term_fields . ", option_value AS date
-            FROM wp_term_taxonomy
-            JOIN wp_terms ON wp_terms.term_id = wp_term_taxonomy.term_id
-            JOIN wp_options ON wp_options.option_name = CONCAT_WS('_', '" . $taxonomy . "', wp_term_taxonomy.term_id, '" . $date_field ."')
-            JOIN wp_term_relationships ON wp_term_relationships.term_taxonomy_id = wp_term_taxonomy.term_taxonomy_id
-            JOIN wp_posts ON wp_posts.ID = wp_term_relationships.object_id
-            WHERE wp_term_taxonomy.taxonomy = '" . $taxonomy . "'
-            AND wp_posts.post_type = 'now_response'
+  $query = "SELECT $wpdb->terms." . $term_fields . ", option_value AS date
+            FROM $wpdb->term_taxonomy
+            JOIN $wpdb->terms ON $wpdb->terms.term_id = $wpdb->term_taxonomy.term_id
+            JOIN $wpdb->options ON $wpdb->options.option_name = CONCAT_WS('_', '" . $taxonomy . "', $wpdb->term_taxonomy.term_id, '" . $date_field ."')
+            JOIN $wpdb->term_relationships ON $wpdb->term_relationships.term_taxonomy_id = $wpdb->term_taxonomy.term_taxonomy_id
+            JOIN $wpdb->posts ON $wpdb->posts.ID = $wpdb->term_relationships.object_id
+            WHERE $wpdb->term_taxonomy.taxonomy = '" . $taxonomy . "'
+            AND $wpdb->posts.post_type = 'now_response'
             GROUP BY slug
             ORDER BY " . $orderby .
             ($limit ? (" LIMIT " . $limit) : "");
