@@ -1,12 +1,6 @@
 <article id="post-<?php the_ID() ?>" <?php post_class('group') ?>>
   <div class="video-thumbnail" style="background-image: url(<?php the_post_thumbnail_url(); ?>)">
-    <?php // the_post_video(); ?>
-    <?php echo wp_video_shortcode(array(
-      'src' => get_the_post_video_url(),
-      'poster' => get_the_post_thumbnail_url(),
-      'width' => 320,
-      'height' => 240
-    )); ?>
+    <?php j4j_the_post_video(); ?>
   </div>
 
   <div class="video-body">

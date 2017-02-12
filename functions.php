@@ -478,6 +478,25 @@ function natural_language_join(array $list, $conjunction = 'and') {
   return $last;
 }
 
+// Doing this instead of `get_the_post_video_url()` avoids hitting the
+// db to load all of the attachment info for the video.
+function j4j_the_post_video() {
+  global $post;
+  $meta = get_post_meta($post->ID, '_fvp_video', true);
+
+  // Don't render anything if this post doesn't have video
+  if (!isset( $meta ) || empty($meta['full'])) {
+    return;
+  }
+
+  echo wp_video_shortcode(array(
+    'src' => $meta['full'],
+    'poster' => get_the_post_thumbnail_url(),
+    'width' => 320,
+    'height' => 240
+  ));
+}
+
 function the_linked_filmmaker_names($should_link = true) {
   $filmmaker_terms = get_the_terms(get_the_ID(), 'filmmaker');
 
