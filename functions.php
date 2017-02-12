@@ -149,7 +149,8 @@ function j4j_pre_get_posts($query) {
     // alphabetical!
     $query->set('orderby', 'title');
     $query->set('order', 'ASC');
-  } else if ($query->is_tax('filmmaker')) {
+  } else if ($query->is_tax && $query->get('filmmaker')) {
+    // Note that we're not doing `$query->is_tax('filmmaker')` because it triggers a db hint
     // We only want videos, not now_responses
     $query->set('post_type', 'video');
   }
