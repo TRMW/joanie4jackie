@@ -724,11 +724,6 @@ function the_chainletter_meta() {
     echo '</p>';
 }
 
-function the_vimeo_link($vimeo_url, $link_text) {
-  $vimeo_embed = get_vimeo_embed($vimeo_url);
-  echo '<a href="' . $vimeo_url . '" class="vimeo-link" data-height="' . $vimeo_embed->height . '" data-width="' . $vimeo_embed->width . '" target="_blank">' . $link_text . ' &raquo;</a>';
-}
-
 function the_video_thumbnail() {
   $video_url = get_field('clip_link');
   if ($video_url) {
@@ -896,13 +891,6 @@ function the_event_date() {
       echo $start_date->format('F d, Y');
     }
   }
-}
-
-function the_TOC_now_link($acg_id) {
-  $year = substr(get_field('chainletter_fulfilled_date', $acg_id), 0, 4);
-  $title_string = str_replace(' ', '_', get_queried_object()->name);
-  // remove non-alphanumeric characters to match TOC plugin generated anchor tags
-  echo preg_replace('/[^a-zA-Z0-9 \-_]*/', '', $year . _ . $title_string);
 }
 
 ?>
