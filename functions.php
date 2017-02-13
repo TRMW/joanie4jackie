@@ -270,8 +270,28 @@ add_action('edited_term', 'delete_taxonomy_transients', 10, 3);
 add_action('edited_filmmaker', 'delete_filmmaker_transients', 10, 2);
 add_action('save_post_video', 'delete_video_transients', 10 ,3);
 add_action('save_post_now_response', 'delete_now_response_transients', 10, 3);
+
+// These ensure embedded galleries are linked to their parent post/term,
+// allowing us to link back to it when they are shown independently in search.
 add_action('save_post_archive', 'set_post_attachments', 10, 3);
 add_action('save_post_event', 'set_post_attachments', 10, 3);
+add_action('edited_term', 'set_term_attachments', 10, 3);
+
+function set_post_attachments($post_ID, $post, $update) {
+  if ($galleries = get_post_galleries($post, false)) {
+    $gallery_ids = array();
+    foreach ($galleries as $gallery) {
+      // $gallery['ids'] is a string like '123, 124, 125'
+      array_push($gallery_ids, $gallery['ids']);
+    }
+    // merge all id strings into one mega string
+    $gallery_ids_string = implode(',', $gallery_ids);
+
+    // copied from wp_media_attach_action source
+    global $wpdb;
+    $wpdb->query($wpdb->prepare("UPDATE $wpdb->posts SET post_parent = %d WHERE post_type = 'attachment' AND ID IN ($gallery_ids_string)", $post_ID));
+  }
+}
 
 // A lot of this is copied from `get_post_galleries`
 // https://developer.wordpress.org/reference/functions/get_post_galleries/
@@ -303,6 +323,21 @@ function get_term_galleries($term_id) {
   return $galleries;
 }
 
+function set_term_attachments($term_id, $tt_id, $taxonomy) {
+  if (get_term_galleries($term_id)) {
+    $gallery_ids = array();
+    foreach ($galleries as $gallery) {
+      // $gallery['ids'] is a string like '123, 124, 125'
+      $gallery_ids = array_merge($gallery_ids, explode(',', $gallery['ids']));
+    }
+    $gallery_ids_array = array_map('intval', $gallery_ids);
+
+    foreach ($gallery_ids_array as $attachment_id) {
+      update_post_meta($attachment_id, 'attachment_parent_term', $term_id);
+    }
+  }
+}
+
 function delete_taxonomy_transients($term_id, $tt_id, $taxonomy) {
   if ($taxonomy === 'filmmaker') {
     delete_transient('filmmaker_links_for_filmmaker_page_' . $term_id);
@@ -316,19 +351,6 @@ function delete_taxonomy_transients($term_id, $tt_id, $taxonomy) {
     foreach (get_terms($taxonomy) as $term) {
       delete_transient('taxonomy_sidebar_' . $taxonomy . '_' . $term->slug);
       delete_transient('now_sidebar_items_' . $taxonomy . '_' . $term->slug);
-    }
-  }
-
-  if (get_term_galleries($term_id)) {
-    $gallery_ids = array();
-    foreach ($galleries as $gallery) {
-      // $gallery['ids'] is a string like '123, 124, 125'
-      $gallery_ids = array_merge($gallery_ids, explode(',', $gallery['ids']));
-    }
-    $gallery_ids_array = array_map('intval', $gallery_ids);
-
-    foreach ($gallery_ids_array as $attachment_id) {
-      update_post_meta($attachment_id, 'attachment_parent_term', $term_id);
     }
   }
 }
@@ -382,22 +404,6 @@ function delete_now_response_transients($post_ID, $post, $update) {
 
   foreach ($filmmaker_videos as $video) {
     delete_transient('filmmaker_links_for_video_' . $video->ID);
-  }
-}
-
-function set_post_attachments($post_ID, $post, $update) {
-  if ($galleries = get_post_galleries($post, false)) {
-    $gallery_ids = array();
-    foreach ($galleries as $gallery) {
-      // $gallery['ids'] is a string like '123, 124, 125'
-      array_push($gallery_ids, $gallery['ids']);
-    }
-    // merge all id strings into one mega string
-    $gallery_ids_string = implode(',', $gallery_ids);
-
-    // copied from wp_media_attach_action source
-    global $wpdb;
-    $wpdb->query($wpdb->prepare("UPDATE $wpdb->posts SET post_parent = %d WHERE post_type = 'attachment' AND ID IN ($gallery_ids_string)", $post_ID));
   }
 }
 
