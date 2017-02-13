@@ -616,7 +616,7 @@ function the_now_video_list($filmmaker) {
   echo $now_video_list_string;
 }
 
-function the_filmmaker_links() {
+function get_the_filmmaker_links() {
   if (is_tax('filmmaker')) {
     $transient_key = 'filmmaker_links_for_filmmaker_page_' . get_queried_object_id();
   } else {
@@ -657,7 +657,7 @@ function the_filmmaker_links() {
     }
     set_transient($transient_key, $filmmaker_links);
   }
-  echo $filmmaker_links;
+  return $filmmaker_links;
 }
 
 function the_video_chainletter_links($wrapper_tag) {

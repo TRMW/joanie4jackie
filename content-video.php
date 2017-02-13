@@ -26,7 +26,7 @@
 
     <ul class="video-links">
       <?php if (!is_tax('filmmaker')) : ?>
-        <?php the_filmmaker_links(); ?>
+        <?php echo get_the_filmmaker_links(); ?>
       <?php endif; ?>
       <li class="edit-link"><?php edit_post_link('Edit this video &raquo;'); ?></li>
     </ul>
