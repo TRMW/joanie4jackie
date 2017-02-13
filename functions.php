@@ -1,199 +1,15 @@
 <?php
 
-// define( 'WP_DEBUG', true );
-
-function get_term_galleries($term_id) {
-  $term_description = get_term($term_id)->description;
-
-  if (!$term_description || !has_shortcode($term_description, 'gallery'))
-    return array();
-
-  $galleries = array();
-  if (preg_match_all('/' . get_shortcode_regex() . '/s', $term_description, $matches, PREG_SET_ORDER)) {
-    foreach ( $matches as $shortcode ) {
-      if ( 'gallery' === $shortcode[2] ) {
-        $srcs = array();
-
-        $gallery = do_shortcode_tag( $shortcode );
-        preg_match_all( '#src=([\'"])(.+?)\1#is', $gallery, $src, PREG_SET_ORDER );
-        if ( ! empty( $src ) ) {
-          foreach ( $src as $s )
-            $srcs[] = $s[2];
-        }
-
-        $data = shortcode_parse_atts( $shortcode[3] );
-        $data['src'] = array_values( array_unique( $srcs ) );
-        $galleries[] = $data;
-      }
-    }
-  }
-  return $galleries;
-}
-
-function delete_taxonomy_transients($term_id, $tt_id, $taxonomy) {
-  if ($taxonomy === 'filmmaker') {
-    delete_transient('filmmaker_links_for_filmmaker_page_' . $term_id);
-    foreach (get_objects_in_term($term_id, $taxonomy) as $term_object) {
-      if ($term_object->type === 'video') {
-        delete_transient('filmmaker_links_for_video_' . $term_object->ID);
-      }
-    }
-  } else { // chainletters and costars
-    delete_transient('taxonomy_sidebar_terms_' . $taxonomy);
-    foreach (get_terms($taxonomy) as $term) {
-      delete_transient('taxonomy_sidebar_' . $taxonomy . '_' . $term->slug);
-      delete_transient('now_sidebar_items_' . $taxonomy . '_' . $term->slug);
-    }
-  }
-
-  if (get_term_galleries($term_id)) {
-    $gallery_ids = array();
-    foreach ($galleries as $gallery) {
-      // $gallery['ids'] is a string like '123, 124, 125'
-      $gallery_ids = array_merge($gallery_ids, explode(',', $gallery['ids']));
-    }
-    $gallery_ids_array = array_map('intval', $gallery_ids);
-
-    foreach ($gallery_ids_array as $attachment_id) {
-      update_post_meta($attachment_id, 'attachment_parent_term', $term_id);
-    }
-  }
-}
-
-function delete_video_transients($post_id, $post, $update) {
-  delete_transient('filmmaker_links_for_video_' . $post_id);
-  delete_transient('video_chainletter_links_' . $post->slug);
-
-  if ($video_filmmakers = get_the_terms($post, 'filmmaker')) {
-    foreach ($video_filmmakers as $filmmaker) {
-      delete_transient('now_video_list_' . $filmmaker->slug);
-    }
-  }
-}
-
-function delete_filmmaker_transients($term_id, $tt_id) {
-  $filmmaker_videos = get_posts(array(
-    'post_type' => 'video',
-    'numberposts' => -1,
-    'tax_query' => array(array(
-      'taxonomy' => 'filmmaker',
-      'field' => 'term_id',
-      'terms' => $term_id
-  ))));
-
-  foreach ($filmmaker_videos as $video) {
-    delete_transient('filmmaker_links_for_video_' . $video->ID);
-  }
-}
-
-function delete_now_response_transients($post_ID, $post, $update) {
-  foreach (get_the_terms($post, 'chainletter') as $term) {
-    delete_transient('now_sidebar_items_chainletter_' . $term->slug);
-  }
-
-  foreach (get_the_terms($post, 'costar') as $term) {
-    delete_transient('now_sidebar_items_costar_' . $term->slug);
-  }
-
-  $filmmakers = get_the_terms($post_ID, 'filmmaker');
-  $filmmaker = $filmmakers[0]; // assume only one filmmamer linked to each interview
-
-  $filmmaker_videos = get_posts(array(
-    'post_type' => 'video',
-    'numberposts' => -1,
-    'tax_query' => array(array(
-      'taxonomy' => 'filmmaker',
-      'field' => 'term_id',
-      'terms' => $filmmaker->term_id
-  ))));
-
-  foreach ($filmmaker_videos as $video) {
-    delete_transient('filmmaker_links_for_video_' . $video->ID);
-  }
-}
-
-function set_post_attachments($post_ID, $post, $update) {
-  if ($galleries = get_post_galleries($post, false)) {
-    $gallery_ids = array();
-    foreach ($galleries as $gallery) {
-      // $gallery['ids'] is a string like '123, 124, 125'
-      array_push($gallery_ids, $gallery['ids']);
-    }
-    // merge all id strings into one mega string
-    $gallery_ids_string = implode(',', $gallery_ids);
-
-    // copied from wp_media_attach_action source
-    global $wpdb;
-    $wpdb->query($wpdb->prepare("UPDATE $wpdb->posts SET post_parent = %d WHERE post_type = 'attachment' AND ID IN ($gallery_ids_string)", $post_ID));
-  }
-}
-
-function remove_video_thumbnails($hits) {
-  $hits[0] = array_filter($hits[0], function($hit) {
-    if ($hit->post_type !== 'attachment') {
-      return true;
-    }
-    if ($hit->post_parent) {
-      // return true (include in results) if no parent or parent type isn't video
-      $parent = get_post($hit->post_parent);
-      return !$parent || $parent->post_type !== 'video';
-    } else {
-      return get_post_meta($hit->ID, 'attachment_parent_term', true) || false;
-    }
-  });
-  return $hits;
-}
-
-function j4j_pre_get_posts($query) {
-  if ($query->is_post_type_archive('now_response')) {
-    // alphabetical!
-    $query->set('orderby', 'title');
-    $query->set('order', 'ASC');
-  } else if ($query->is_tax && $query->get('filmmaker')) {
-    // Note that we're not doing `$query->is_tax('filmmaker')` because it triggers a db hint
-    // We only want videos, not now_responses
-    $query->set('post_type', 'video');
-  }
-}
-
-function j4j_the_posts($posts, $query) {
-  if ($query->is_main_query() && $query->is_tax && ($query->get('chainletter') || $query->get('costar'))) {
-    // For tape pages we want to filter out the Now responses so we can use them later without hitting
-    // the db, and also so we can assume the loop is only getting video posts.
-    $video_posts = array();
-    $now_posts = array();
-    foreach ($posts as $post) {
-      if ($post->post_type === 'now_response') {
-        $now_posts[get_the_terms($post->ID, 'filmmaker')[0]->term_id] = $post;
-      } else {
-        $video_posts[] = $post;
-      }
-    }
-    // stash this for later use in `the_filmmaker_links()`
-    $query->now_posts = $now_posts;
-    return $video_posts;
-  } else {
-    return $posts;
-  }
-}
-
-// TODO: Cache the Now sidebar / see if we can remove that function
-add_action('edited_term', 'delete_taxonomy_transients', 10, 3);
-add_action('edited_filmmaker', 'delete_filmmaker_transients', 10, 2);
-add_action('save_post_video', 'delete_video_transients', 10 ,3);
-add_action('save_post_now_response', 'delete_now_response_transients', 10, 3);
-add_action('save_post_archive', 'set_post_attachments', 10, 3);
-add_action('save_post_event', 'set_post_attachments', 10, 3);
-add_action('pre_get_posts', 'j4j_pre_get_posts');
-add_action('the_posts', 'j4j_the_posts', 10, 2);
+/****************************
+ * Initialization
+ ****************************/
 
 add_action('init', 'j4j_registrations');
 add_action('init', 'add_j4j_rewrite_rules');
+add_action('after_setup_theme', 'j4j_setup');
+add_action('after_setup_theme', 'j4j_frontend_setup');
 add_action('generate_rewrite_rules', 'setup_taxonomy_index_rules');
-add_action('edited_chainletter', 'flush_rewrite_rules');
-add_action('edited_costar', 'flush_rewrite_rules');
-add_action('admin_menu', 'j4j_admin_menu_tweaks');
-add_action('admin_bar_menu', 'j4j_admin_bar_menu_tweaks', 999);
+add_filter('nav_menu_css_class', 'set_active_menu_class', 10, 2);
 
 function j4j_setup() {
   // This theme uses post thumbnails
@@ -207,8 +23,6 @@ function j4j_setup() {
   register_nav_menus(array('primary' => 'Primary Navigation'));
 }
 
-add_action('after_setup_theme', 'j4j_setup');
-
 function j4j_frontend_setup() {
   if(!is_admin() && !in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php'))) {
     // last two arguments are version number and $in_footer
@@ -219,11 +33,6 @@ function j4j_frontend_setup() {
     wp_enqueue_style('j4j-style', get_stylesheet_uri());
   }
 }
-
-add_action('after_setup_theme', 'j4j_frontend_setup');
-
-add_filter('nav_menu_css_class', 'set_active_menu_class', 10, 2);
-add_filter('relevanssi_hits_filter', 'remove_video_thumbnails');
 
 function add_j4j_rewrite_rules() {
   add_rewrite_rule(
@@ -450,6 +259,220 @@ function setup_taxonomy_index_rules($wp_rewrite) {
   $wp_rewrite->rules = array_merge($taxonomy_index_rules, $wp_rewrite->rules);
 }
 
+
+/****************************
+ * Saving and editing
+ ****************************/
+
+add_action('edited_chainletter', 'flush_rewrite_rules');
+add_action('edited_costar', 'flush_rewrite_rules');
+add_action('edited_term', 'delete_taxonomy_transients', 10, 3);
+add_action('edited_filmmaker', 'delete_filmmaker_transients', 10, 2);
+add_action('save_post_video', 'delete_video_transients', 10 ,3);
+add_action('save_post_now_response', 'delete_now_response_transients', 10, 3);
+add_action('save_post_archive', 'set_post_attachments', 10, 3);
+add_action('save_post_event', 'set_post_attachments', 10, 3);
+
+// A lot of this is copied from `get_post_galleries`
+// https://developer.wordpress.org/reference/functions/get_post_galleries/
+function get_term_galleries($term_id) {
+  $term_description = get_term($term_id)->description;
+
+  if (!$term_description || !has_shortcode($term_description, 'gallery'))
+    return array();
+
+  $galleries = array();
+  if (preg_match_all('/' . get_shortcode_regex() . '/s', $term_description, $matches, PREG_SET_ORDER)) {
+    foreach ($matches as $shortcode) {
+      if ('gallery' === $shortcode[2]) {
+        $srcs = array();
+
+        $gallery = do_shortcode_tag($shortcode);
+        preg_match_all('#src=([\'"])(.+?)\1#is', $gallery, $src, PREG_SET_ORDER);
+        if (!empty($src)) {
+          foreach ($src as $s)
+            $srcs[] = $s[2];
+        }
+
+        $data = shortcode_parse_atts($shortcode[3]);
+        $data['src'] = array_values(array_unique($srcs));
+        $galleries[] = $data;
+      }
+    }
+  }
+  return $galleries;
+}
+
+function delete_taxonomy_transients($term_id, $tt_id, $taxonomy) {
+  if ($taxonomy === 'filmmaker') {
+    delete_transient('filmmaker_links_for_filmmaker_page_' . $term_id);
+    foreach (get_objects_in_term($term_id, $taxonomy) as $term_object) {
+      if ($term_object->type === 'video') {
+        delete_transient('filmmaker_links_for_video_' . $term_object->ID);
+      }
+    }
+  } else { // chainletters and costars
+    delete_transient('taxonomy_sidebar_terms_' . $taxonomy);
+    foreach (get_terms($taxonomy) as $term) {
+      delete_transient('taxonomy_sidebar_' . $taxonomy . '_' . $term->slug);
+      delete_transient('now_sidebar_items_' . $taxonomy . '_' . $term->slug);
+    }
+  }
+
+  if (get_term_galleries($term_id)) {
+    $gallery_ids = array();
+    foreach ($galleries as $gallery) {
+      // $gallery['ids'] is a string like '123, 124, 125'
+      $gallery_ids = array_merge($gallery_ids, explode(',', $gallery['ids']));
+    }
+    $gallery_ids_array = array_map('intval', $gallery_ids);
+
+    foreach ($gallery_ids_array as $attachment_id) {
+      update_post_meta($attachment_id, 'attachment_parent_term', $term_id);
+    }
+  }
+}
+
+function delete_video_transients($post_id, $post, $update) {
+  delete_transient('filmmaker_links_for_video_' . $post_id);
+  delete_transient('video_chainletter_links_' . $post->slug);
+
+  if ($video_filmmakers = get_the_terms($post, 'filmmaker')) {
+    foreach ($video_filmmakers as $filmmaker) {
+      delete_transient('now_video_list_' . $filmmaker->slug);
+    }
+  }
+}
+
+function delete_filmmaker_transients($term_id, $tt_id) {
+  $filmmaker_videos = get_posts(array(
+    'post_type' => 'video',
+    'numberposts' => -1,
+    'tax_query' => array(array(
+      'taxonomy' => 'filmmaker',
+      'field' => 'term_id',
+      'terms' => $term_id
+  ))));
+
+  foreach ($filmmaker_videos as $video) {
+    delete_transient('filmmaker_links_for_video_' . $video->ID);
+  }
+}
+
+function delete_now_response_transients($post_ID, $post, $update) {
+  foreach (get_the_terms($post, 'chainletter') as $term) {
+    delete_transient('now_sidebar_items_chainletter_' . $term->slug);
+  }
+
+  foreach (get_the_terms($post, 'costar') as $term) {
+    delete_transient('now_sidebar_items_costar_' . $term->slug);
+  }
+
+  $filmmakers = get_the_terms($post_ID, 'filmmaker');
+  $filmmaker = $filmmakers[0]; // assume only one filmmamer linked to each interview
+
+  $filmmaker_videos = get_posts(array(
+    'post_type' => 'video',
+    'numberposts' => -1,
+    'tax_query' => array(array(
+      'taxonomy' => 'filmmaker',
+      'field' => 'term_id',
+      'terms' => $filmmaker->term_id
+  ))));
+
+  foreach ($filmmaker_videos as $video) {
+    delete_transient('filmmaker_links_for_video_' . $video->ID);
+  }
+}
+
+function set_post_attachments($post_ID, $post, $update) {
+  if ($galleries = get_post_galleries($post, false)) {
+    $gallery_ids = array();
+    foreach ($galleries as $gallery) {
+      // $gallery['ids'] is a string like '123, 124, 125'
+      array_push($gallery_ids, $gallery['ids']);
+    }
+    // merge all id strings into one mega string
+    $gallery_ids_string = implode(',', $gallery_ids);
+
+    // copied from wp_media_attach_action source
+    global $wpdb;
+    $wpdb->query($wpdb->prepare("UPDATE $wpdb->posts SET post_parent = %d WHERE post_type = 'attachment' AND ID IN ($gallery_ids_string)", $post_ID));
+  }
+}
+
+
+/****************************
+ * Query Customization
+ ****************************/
+
+add_action('pre_get_posts', 'j4j_pre_get_posts');
+add_action('the_posts', 'j4j_the_posts', 10, 2);
+
+function j4j_pre_get_posts($query) {
+  if ($query->is_post_type_archive('now_response')) {
+    // alphabetical!
+    $query->set('orderby', 'title');
+    $query->set('order', 'ASC');
+  } else if ($query->is_tax && $query->get('filmmaker')) {
+    // Note that we're not doing `$query->is_tax('filmmaker')` because it triggers a db hint
+    // We only want videos, not now_responses
+    $query->set('post_type', 'video');
+  }
+}
+
+function j4j_the_posts($posts, $query) {
+  if ($query->is_main_query() && $query->is_tax && ($query->get('chainletter') || $query->get('costar'))) {
+    // For tape pages we want to filter out the Now responses so we can use them later without hitting
+    // the db, and also so we can assume the loop is only getting video posts.
+    $video_posts = array();
+    $now_posts = array();
+    foreach ($posts as $post) {
+      if ($post->post_type === 'now_response') {
+        $now_posts[get_the_terms($post->ID, 'filmmaker')[0]->term_id] = $post;
+      } else {
+        $video_posts[] = $post;
+      }
+    }
+    // stash this for later use in `the_filmmaker_links()`
+    $query->now_posts = $now_posts;
+    return $video_posts;
+  } else {
+    return $posts;
+  }
+}
+
+
+/****************************
+ * Search Customization
+ ****************************/
+
+add_filter('relevanssi_hits_filter', 'remove_video_thumbnails');
+
+function remove_video_thumbnails($hits) {
+  $hits[0] = array_filter($hits[0], function($hit) {
+    if ($hit->post_type !== 'attachment') {
+      return true;
+    }
+    if ($hit->post_parent) {
+      // return true (include in results) if no parent or parent type isn't video
+      $parent = get_post($hit->post_parent);
+      return !$parent || $parent->post_type !== 'video';
+    } else {
+      return get_post_meta($hit->ID, 'attachment_parent_term', true) || false;
+    }
+  });
+  return $hits;
+}
+
+
+/****************************
+ * Admin Tweaks
+ ****************************/
+
+add_action('admin_menu', 'j4j_admin_menu_tweaks');
+add_action('admin_bar_menu', 'j4j_admin_bar_menu_tweaks', 999);
+
 function j4j_admin_menu_tweaks() {
   remove_menu_page('link-manager.php'); // Links
   remove_menu_page('edit.php'); // Default Posts
@@ -458,12 +481,14 @@ function j4j_admin_menu_tweaks() {
 
 function j4j_admin_bar_menu_tweaks() {
   global $wp_admin_bar;
-  $wp_admin_bar->remove_node( 'new-post' );
-  $wp_admin_bar->remove_node( 'new-link' );
-  // $wp_admin_bar->remove_node( 'new-media' );
+  $wp_admin_bar->remove_node('new-post');
+  $wp_admin_bar->remove_node('new-link');
 }
 
-// Template Helper Functions
+
+/****************************
+ * Template Helper Functions
+ ****************************/
 
 function get_term_path($term, $taxonomy) {
   global $wp_rewrite;
@@ -830,7 +855,7 @@ function get_post_type_sidebar() {
   }
 
   echo('<nav class="sidebar"><ul>');
-  foreach($sidebar_posts as $i => $sidebar_post) {
+  foreach ($sidebar_posts as $i => $sidebar_post) {
     $year = '';
     if ($post_type == 'event') {
       $meta = get_post_meta($sidebar_post->ID);
