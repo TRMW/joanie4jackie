@@ -660,7 +660,7 @@ function get_the_filmmaker_links() {
   return $filmmaker_links;
 }
 
-function the_video_chainletter_links($wrapper_tag) {
+function the_video_chainletter_links() {
   global $post;
   $transient_key = 'video_chainletter_links_' . $post->post_name;
 
@@ -680,9 +680,7 @@ function the_video_chainletter_links($wrapper_tag) {
     }
   }
 
-  if ($html) {
-    echo '<'.$wrapper_tag.'>' . $html . '</'.$wrapper_tag.'>';
-  }
+  echo $html;
 }
 
 function the_chainletter_meta() {

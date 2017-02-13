@@ -13,7 +13,7 @@
       <h3 class="entry-author"><?php the_linked_filmmaker_names(); ?></h3>
     <?php endif; ?>
     <?php if (is_search() || is_single() || is_tax('filmmaker')) : ?>
-      <?php the_video_chainletter_links('p'); ?>
+      <p><?php the_video_chainletter_links(); ?></p>
     <?php endif; ?>
 
     <div class="entry-content">
