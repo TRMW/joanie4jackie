@@ -750,7 +750,7 @@ function get_taxonomy_terms_by_custom_date($taxonomy, $term_fields = null, $limi
   $date_field = 'chainletter_fulfilled_date';
   $orderby = 'date';
 
-  $query = "SELECT $wpdb->terms." . $term_fields . ", option_value AS date
+  $query = "SELECT " . $term_fields . ", option_value AS date
             FROM $wpdb->term_taxonomy
             JOIN $wpdb->terms ON $wpdb->terms.term_id = $wpdb->term_taxonomy.term_id
             JOIN $wpdb->options ON $wpdb->options.option_name = CONCAT_WS('_', '" . $taxonomy . "', $wpdb->term_taxonomy.term_id, '" . $date_field ."')
