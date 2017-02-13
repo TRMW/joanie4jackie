@@ -156,6 +156,27 @@ function j4j_pre_get_posts($query) {
   }
 }
 
+function j4j_the_posts($posts, $query) {
+  if ($query->is_main_query() && $query->is_tax && ($query->get('chainletter') || $query->get('costar'))) {
+    // For tape pages we want to filter out the Now responses so we can use them later without hitting
+    // the db, and also so we can assume the loop is only getting video posts.
+    $video_posts = array();
+    $now_posts = array();
+    foreach ($posts as $post) {
+      if ($post->post_type === 'now_response') {
+        $now_posts[get_the_terms($post->ID, 'filmmaker')[0]->term_id] = $post;
+      } else {
+        $video_posts[] = $post;
+      }
+    }
+    // stash this for later use in `the_filmmaker_links()`
+    $query->now_posts = $now_posts;
+    return $video_posts;
+  } else {
+    return $posts;
+  }
+}
+
 // TODO: Cache the Now sidebar / see if we can remove that function
 add_action('edited_term', 'delete_taxonomy_transients', 10, 3);
 add_action('edited_filmmaker', 'delete_filmmaker_transients', 10, 2);
@@ -164,6 +185,7 @@ add_action('save_post_now_response', 'delete_now_response_transients', 10, 3);
 add_action('save_post_archive', 'set_post_attachments', 10, 3);
 add_action('save_post_event', 'set_post_attachments', 10, 3);
 add_action('pre_get_posts', 'j4j_pre_get_posts');
+add_action('the_posts', 'j4j_the_posts', 10, 2);
 
 add_action('init', 'j4j_registrations');
 add_action('init', 'add_j4j_rewrite_rules');
@@ -604,22 +626,32 @@ function the_filmmaker_links() {
     $filmmaker_links = '';
     $filmmakers = is_tax('filmmaker') ? array(get_queried_object()) : get_the_terms(get_the_ID(), 'filmmaker');
     if ($filmmakers) {
-      foreach($filmmakers as $filmmaker ) {
+      foreach ($filmmakers as $filmmaker) {
         $filmmaker_website = get_field('filmmaker_website', $filmmaker);
         if($filmmaker_website) {
           $filmmaker_links .= '<li><a href="' . $filmmaker_website . '">Filmmaker’s Website' . (count($filmmakers) > 1 ? ' (' . $filmmaker->name . ')' : '') . ' &raquo;</a></li>';
         }
 
-        $now_response = get_posts(array(
-          'numberposts' => 1,
-          'post_type' => 'now_response',
-          'tax_query' => array(array(
-            'taxonomy' => 'filmmaker',
-            'field' => 'term_id',
-            'terms' => $filmmaker->term_id
-        ))));
+        $now_response = null;
+        global $wp_query;
+        // `$wp_query->now_posts` is set up in `j4j_the_posts` for tape pages but not video pages
+        if ($wp_query->now_posts) {
+          if (array_key_exists($filmmaker->term_id, $wp_query->now_posts))
+            $now_response = $wp_query->now_posts[$filmmaker->term_id];
+        } else {
+          $now_responses = get_posts(array(
+            'numberposts' => 1,
+            'post_type' => 'now_response',
+            'tax_query' => array(array(
+              'taxonomy' => 'filmmaker',
+              'field' => 'term_id',
+              'terms' => $filmmaker->term_id
+          ))));
+          $now_response = empty($now_responses) ? null : $now_responses[0];
+        }
+
         if ($now_response) {
-          $filmmaker_links .= '<li><a href="' . get_post_permalink($now_response[0]->ID) . '">Where Is She Now?' . (count($filmmakers) > 1 ? ' (' . $filmmaker->name . ')' : '') . ' &raquo;</a></li>';
+          $filmmaker_links .= '<li><a href="' . get_post_permalink($now_response->ID) . '">Where Is She Now?' . (count($filmmakers) > 1 ? ' (' . $filmmaker->name . ')' : '') . ' &raquo;</a></li>';
         }
       }
     }
