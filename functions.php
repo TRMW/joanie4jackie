@@ -508,7 +508,7 @@ function fast_get_term_link($term, $taxonomy) {
 }
 
 function get_the_now_link($term, $taxonomy) {
-  $now_path = '/now/' . get_term_path($term, $taxonomy);
+  $now_path = '/now' . get_term_path($term, $taxonomy);
   return home_url(user_trailingslashit($now_path, 'category'));
 }
 
