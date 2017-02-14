@@ -420,15 +420,11 @@ function j4j_pre_get_posts($query) {
     // alphabetical!
     $query->set('orderby', 'title');
     $query->set('order', 'ASC');
-  } else if ($query->is_tax && $query->get('filmmaker')) {
-    // Note that we're not doing `$query->is_tax('filmmaker')` because it triggers a db hint
-    // We only want videos, not now_responses
-    $query->set('post_type', 'video');
   }
 }
 
 function j4j_the_posts($posts, $query) {
-  if ($query->is_main_query() && $query->is_tax && (($query->get('chainletter') || $query->get('costar')) && !$query->get('post_type') === 'now_response')) {
+  if ($query->is_main_query() && $query->is_tax && !$query->is_post_type_archive('now_response')) {
     // For tape pages we want to filter out the Now responses so we can use them later without hitting
     // the db, and also so we can assume the loop is only getting video posts.
     $video_posts = array();
